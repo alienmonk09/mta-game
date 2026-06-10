@@ -42,7 +42,8 @@ npm run typecheck && npm test && npm run build && npm run smoke
 - Última atualização: Fase 0 ✅ · Fase 1 ✅ · Roadmap finalizado ✅. **Próximo: Fase 2 (loop viral).**
 
 ## Como retomar (nova sessão) — sem perder nada
-Tudo está no disco em `/Users/jader/dev/mta-game` (código, docs, `node_modules`). Para retomar:
+Tudo está versionado no repo **privado** `alienmonk09/mta-game` (e no disco em
+`/Users/jader/dev/mta-game`). Backup/clone: `gh repo clone alienmonk09/mta-game`. Para retomar:
 1. `cd /Users/jader/dev/mta-game`
 2. Abrir o Claude Code e dizer: **"leia docs/STATUS.md e continue da Fase 2"**.
 3. Sanidade antes de codar: `npm run typecheck && npm test && npm run build && npm run smoke` (tudo verde).
