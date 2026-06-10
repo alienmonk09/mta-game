@@ -1,0 +1,99 @@
+// Smoke test headless: builda já deve ter rodado; sobe o preview, dá boot no
+// jogo no Chromium, entra na RunScene e falha se houver erro de runtime.
+// Uso: npm run smoke   (reutilizável a cada tick do loop)
+import { spawn } from 'node:child_process';
+import http from 'node:http';
+import { chromium } from 'playwright';
+
+const PORT = 4173;
+const URL = `http://localhost:${PORT}/`;
+const SHOT = '/tmp/mta-smoke.png';
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function ping(url) {
+  return new Promise((resolve) => {
+    const req = http.get(url, (res) => {
+      res.resume();
+      resolve(res.statusCode === 200);
+    });
+    req.on('error', () => resolve(false));
+    req.setTimeout(1500, () => {
+      req.destroy();
+      resolve(false);
+    });
+  });
+}
+
+async function waitForServer(timeoutMs = 25000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    if (await ping(URL)) return true;
+    await sleep(500);
+  }
+  return false;
+}
+
+const preview = spawn('npm', ['run', 'preview', '--', '--port', String(PORT), '--strictPort'], {
+  cwd: process.cwd(),
+  stdio: 'ignore',
+});
+
+let browser;
+const errors = [];
+let exitCode = 0;
+
+try {
+  if (!(await waitForServer())) throw new Error('preview não respondeu a tempo');
+
+  browser = await chromium.launch();
+  const page = await browser.newPage({ viewport: { width: 480, height: 854 } });
+  page.on('console', (m) => {
+    if (m.type() === 'error') errors.push(`console.error: ${m.text()}`);
+  });
+  page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+
+  await page.goto(URL, { waitUntil: 'load', timeout: 15000 });
+  await page.waitForSelector('canvas', { timeout: 10000 });
+  await sleep(1500); // boot + fetch do tema + MenuScene
+
+  const boot = await page.evaluate(() => {
+    const g = window.__MTA_GAME__;
+    const c = document.querySelector('canvas');
+    return {
+      hasGame: !!g,
+      scenes: g ? g.scene.getScenes(true).map((s) => s.scene.key) : [],
+      canvas: c ? { w: c.width, h: c.height } : null,
+    };
+  });
+  if (!boot.hasGame) throw new Error('window.__MTA_GAME__ ausente — boot falhou');
+  if (!boot.canvas || boot.canvas.w === 0) throw new Error('canvas não renderizou');
+  console.log(`boot ok · cenas ativas: ${boot.scenes.join(', ')} · canvas ${boot.canvas.w}x${boot.canvas.h}`);
+
+  // entra na RunScene e deixa rodar (gera erro de runtime se a cena quebrar)
+  await page.evaluate(() => window.__MTA_GAME__.scene.start('RunScene', { casoId: 'bpc' }));
+  await sleep(2500);
+  const inRun = await page.evaluate(() => window.__MTA_GAME__.scene.getScenes(true).map((s) => s.scene.key));
+  if (!inRun.includes('RunScene')) throw new Error(`RunScene não ativa (ativas: ${inRun.join(', ')})`);
+  console.log(`RunScene rodando · cenas ativas: ${inRun.join(', ')}`);
+
+  await page.screenshot({ path: SHOT });
+  console.log(`screenshot: ${SHOT}`);
+
+  if (errors.length) {
+    exitCode = 1;
+    console.error(`\n❌ ${errors.length} erro(s) de runtime:`);
+    for (const e of errors) console.error('  - ' + e);
+  } else {
+    console.log('\n✅ smoke OK — boot + MenuScene + RunScene sem erros de runtime');
+  }
+} catch (err) {
+  exitCode = 1;
+  console.error(`\n❌ smoke falhou: ${err.message}`);
+  if (errors.length) for (const e of errors) console.error('  - ' + e);
+} finally {
+  if (browser) await browser.close();
+  preview.kill('SIGTERM');
+}
+
+process.exit(exitCode);

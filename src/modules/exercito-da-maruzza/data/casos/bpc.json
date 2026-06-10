@@ -1,0 +1,15 @@
+{
+  "id": "bpc",
+  "name": "BPC-LOAS da Dona Cida",
+  "start": 1,
+  "speed": 320,
+  "gates": [
+    { "dist": 520,  "left": { "op": "mul", "value": 2, "label": "Laudo médico" },   "right": { "op": "sub", "value": 3, "label": "Sem laudo" } },
+    { "dist": 1040, "left": { "op": "add", "value": 5, "label": "CNIS" },            "right": { "op": "div", "value": 2, "label": "Falta CNIS" } },
+    { "dist": 1560, "left": { "op": "sub", "value": 5, "label": "Exigência" },        "right": { "op": "mul", "value": 2, "label": "CadÚnico" } },
+    { "dist": 2080, "left": { "op": "mul", "value": 2, "label": "Perícia" },          "right": { "op": "div", "value": 2, "label": "Remarcada" } },
+    { "dist": 2600, "left": { "op": "add", "value": 10, "label": "Testemunha" },      "right": { "op": "sub", "value": 8, "label": "Indeferido" } },
+    { "dist": 3120, "left": { "op": "div", "value": 3, "label": "Recurso negado" },   "right": { "op": "mul", "value": 2, "label": "Sentença" } }
+  ],
+  "wall": 60
+}

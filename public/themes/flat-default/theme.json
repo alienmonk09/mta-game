@@ -1,0 +1,18 @@
+{
+  "id": "flat-default",
+  "palette": {
+    "bg.base": "#0b1020",
+    "accent.primary": "#22c55e",
+    "accent.secondary": "#6366f1",
+    "gate.good": "#22c55e",
+    "gate.bad": "#ef4444",
+    "wall": "#475569",
+    "text": "#e2e8f0",
+    "text.muted": "#94a3b8"
+  },
+  "copy": {
+    "title": "Exército da Maruzza",
+    "subtitle": "Junte as provas e derrube o muro do INSS",
+    "play": "▶ JOGAR"
+  }
+}

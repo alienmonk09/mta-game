@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.superpowers/
+*.local
+.DS_Store
+npm-debug.log*
+
+# locks transientes do harness
+.claude/scheduled_tasks.lock

@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "skills": {
+    "animations": {
+      "source": "phaserjs/phaser",
+      "sourceType": "github",
+      "skillPath": "skills/animations/SKILL.md",
+      "computedHash": "7e5ce476a4bf1a65ba07bd8e0e38e4e8d95c7491563b309ea1e457ac3545ed5f"
+    },
+    "audio-and-sound": {
+      "source": "phaserjs/phaser",
+      "sourceType": "github",
+      "skillPath": "skills/audio-and-sound/SKILL.md",
+      "computedHash": "0ac3d8b80936f93f78e437cdaa8399efa6054f08244d90eb78de7b5f5ddec337"
+    },
+    "game-setup-and-config": {
+      "source": "phaserjs/phaser",
+      "sourceType": "github",
+      "skillPath": "skills/game-setup-and-config/SKILL.md",
+      "computedHash": "9864274b28b515d15ea06e10c45c7dd44133013ae381664ff8cd445d2c0c4403"
+    },
+    "game-ui-design": {
+      "source": "omer-metin/skills-for-antigravity",
+      "sourceType": "github",
+      "skillPath": "skills/game-ui-design/SKILL.md",
+      "computedHash": "cff8acaf58f3f4255f76fb962775fb1a2fec1fce49a54a50bde2c1efd5eb33ec"
+    },
+    "phaser-design-patterns": {
+      "source": "agusstingalvan/gamedev-skills",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/phaser-design-patterns/SKILL.md",
+      "computedHash": "3a91373c3ab1f762ed1db8a712bc73dc79ac46870ba62b509c6069a545309cbb"
+    },
+    "pixel-art-sprites": {
+      "source": "omer-metin/skills-for-antigravity",
+      "sourceType": "github",
+      "skillPath": "skills/pixel-art-sprites/SKILL.md",
+      "computedHash": "6d7f3d45af2fa94e0fe9abe08575e859aa0f24297305ee8b89ac64a7534c9825"
+    },
+    "scenes": {
+      "source": "phaserjs/phaser",
+      "sourceType": "github",
+      "skillPath": "skills/scenes/SKILL.md",
+      "computedHash": "3bcf15713cc8dcabe2df26f7eb1fa22b24c0a467a436c35b691ea3baf6677400"
+    },
+    "sprites-and-images": {
+      "source": "phaserjs/phaser",
+      "sourceType": "github",
+      "skillPath": "skills/sprites-and-images/SKILL.md",
+      "computedHash": "dfa048c9121566261eae554b4c4b20854991c59736df199809966b4ddcc743e0"
+    },
+    "tilemaps": {
+      "source": "phaserjs/phaser",
+      "sourceType": "github",
+      "skillPath": "skills/tilemaps/SKILL.md",
+      "computedHash": "193c4ada1b52d2467bdc243cdde0c97116b372c8551c4e652fad9b8c67f163bf"
+    },
+    "tweens": {
+      "source": "phaserjs/phaser",
+      "sourceType": "github",
+      "skillPath": "skills/tweens/SKILL.md",
+      "computedHash": "58187d8638dd5168b9d78be6d54b82ef57571214c2d17b8ca9b1bdbae484259e"
+    },
+    "v4-new-features": {
+      "source": "phaserjs/phaser",
+      "sourceType": "github",
+      "skillPath": "skills/v4-new-features/SKILL.md",
+      "computedHash": "6a4e403e919172172ebb9ad41cc639dc0aeb529fb0a7c86415510bab77e25fde"
+    }
+  }
+}
