@@ -1,0 +1,17 @@
+{
+  "id": "aposentadoria-idade-rural",
+  "name": "Aposentadoria Rural do Seu Manoel",
+  "tagline": "A roça prova o tempo de labor",
+  "order": 3,
+  "start": 3,
+  "speed": 330,
+  "wall": 64,
+  "gates": [
+    { "dist": 520,  "left": { "op": "mul", "value": 2,  "label": "Bloco notas" },    "right": { "op": "div", "value": 2, "label": "Sem registro" } },
+    { "dist": 1040, "left": { "op": "add", "value": 7,  "label": "Testemunha" },     "right": { "op": "div", "value": 2, "label": "Vistoria neg." } },
+    { "dist": 1560, "left": { "op": "mul", "value": 3,  "label": "Doc sindicato" },  "right": { "op": "div", "value": 3, "label": "Autodecl fraca" } },
+    { "dist": 2080, "left": { "op": "add", "value": 9,  "label": "Contrato safra" }, "right": { "op": "sub", "value": 5, "label": "Doc rejeitado" } },
+    { "dist": 2600, "left": { "op": "mul", "value": 2,  "label": "ITR da terra" },   "right": { "op": "div", "value": 2, "label": "Período negado" } },
+    { "dist": 3120, "left": { "op": "add", "value": 12, "label": "Cad. produtor" },  "right": { "op": "div", "value": 2, "label": "Idade exigida" } }
+  ]
+}

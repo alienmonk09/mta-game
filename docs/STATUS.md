@@ -27,8 +27,19 @@ skin **Bumba meu boi** na Fase 4.
       - **Verificado:** typecheck ✓, 16 testes ✓, build ✓, **smoke headless** (`npm run smoke`) boot+RunScene ✓
         — screenshot em `docs/screens/fase1-runscene.png`
       - infra nova: Playwright + `scripts/smoke.mjs` (reutilizável a cada tick)
-- [ ] **Fase 2 — Loop viral** ⬅️ **PRÓXIMO** (ResultScene + ShareCard canvas, recorde, 3-5 casos, juice/áudio)
-- [ ] **Fase 3 — Beleza & acessibilidade**
+- [x] **Fase 2 — Loop viral** ✅ implementado e verificado:
+      - `ResultScene` (recorde local, count-up, confete, botões compartilhar/jogar/menu, mute)
+      - `ShareCard` real **genérico** (Canvas→PNG 1080×1350, Web Share API + fallback download); copy do card
+        vem do `theme.json` (dado, trocável por skin) e o módulo monta `CardContent` (`systems/card.ts`)
+      - `AudioManager` real (SFX sintetizados via Web Audio + trilha ambiente + mute persistido — **zero assets**)
+      - Juice: `Crowd.pulse`, flash de portão, count pop, camera shake, muro estilhaça (vitória) / segura (derrota)
+      - **5 casos** data-driven (BPC + auxílio-doença + apos. rural + apos. urbana), balanceados (invariante testado)
+      - `MenuScene` com seletor de casos data-driven (recorde por caso) + token `outline` (cores 100% via tema)
+      - **Verificado:** typecheck ✓, **46 testes** ✓, build ✓, smoke headless (boot→Menu→Run→Result→card PNG) ✓
+        — screenshots em `docs/screens/fase2-{menu,run,card}.png`
+      - **Review adversarial** (workflow 3 dimensões + verificação cética): 6 achados confirmados e corrigidos
+        (ShareCard agnóstico ao módulo; card reenquadrado como JOGO p/ risco OAB; BPC sem termos judiciais)
+- [ ] **Fase 3 — Beleza & acessibilidade** ⬅️ **PRÓXIMO**
 - [ ] **Fase 4 — Skin Bumba meu boi** (implementar `themes/bumba-boi/` conforme roadmap §7)
 - [ ] **Fase 5 — Hub & expansão**
 
@@ -39,13 +50,14 @@ npm run typecheck && npm test && npm run build && npm run smoke
 
 ## Loop
 - **Build noturno CANCELADO** a pedido do usuário (2026-06-10 ~00:2x). Não rearmar ScheduleWakeup.
-- Última atualização: Fase 0 ✅ · Fase 1 ✅ · Roadmap finalizado ✅. **Próximo: Fase 2 (loop viral).**
+- Última atualização (2026-06-10): Fase 0 ✅ · Fase 1 ✅ · **Fase 2 ✅ (loop viral completo: jogar→ganhar→compartilhar)**.
+  **Primeira versão jogável (produto viral mínimo) entregue.** Próximo: Fase 3 (beleza & acessibilidade).
 
 ## Como retomar (nova sessão) — sem perder nada
 Tudo está versionado no repo **privado** `alienmonk09/mta-game` (e no disco em
 `/Users/jader/dev/mta-game`). Backup/clone: `gh repo clone alienmonk09/mta-game`. Para retomar:
 1. `cd /Users/jader/dev/mta-game`
-2. Abrir o Claude Code e dizer: **"leia docs/STATUS.md e continue da Fase 2"**.
+2. Abrir o Claude Code e dizer: **"leia docs/STATUS.md e continue da Fase 3"**.
 3. Sanidade antes de codar: `npm run typecheck && npm test && npm run build && npm run smoke` (tudo verde).
 4. Próxima fase e checklist completo: este arquivo + `docs/roadmap.md` (§4 Fase 2).
 

@@ -22,8 +22,10 @@ async function bootstrap(): Promise<void> {
   const game = new Phaser.Game(config);
   game.registry.set('activeModule', active.id);
 
-  // hook para testes headless (smoke). Inofensivo em produção.
-  (window as unknown as { __MTA_GAME__?: Phaser.Game }).__MTA_GAME__ = game;
+  // hooks para testes headless (smoke). Inofensivos em produção.
+  const w = window as unknown as { __MTA_GAME__?: Phaser.Game; __MTA_SERVICES__?: typeof services };
+  w.__MTA_GAME__ = game;
+  w.__MTA_SERVICES__ = services;
 }
 
 void bootstrap();

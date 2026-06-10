@@ -1,0 +1,17 @@
+{
+  "id": "aposentadoria-urbana",
+  "name": "Aposentadoria Urbana do Seu Antônio",
+  "tagline": "Cada vínculo conta: documento vence burocracia",
+  "order": 4,
+  "start": 3,
+  "speed": 340,
+  "wall": 96,
+  "gates": [
+    { "dist": 520,  "left": { "op": "mul", "value": 2,  "label": "CTPS assinada" }, "right": { "op": "div", "value": 2, "label": "Vínculo omisso" } },
+    { "dist": 1040, "left": { "op": "add", "value": 8,  "label": "Holerites" },     "right": { "op": "div", "value": 2, "label": "CNIS diverg." } },
+    { "dist": 1560, "left": { "op": "mul", "value": 3,  "label": "GFIP empresa" },  "right": { "op": "div", "value": 3, "label": "Sem recolhim." } },
+    { "dist": 2080, "left": { "op": "add", "value": 11, "label": "PPP atividade" }, "right": { "op": "sub", "value": 6, "label": "Empresa fechou" } },
+    { "dist": 2600, "left": { "op": "mul", "value": 3,  "label": "Ficha registro" },"right": { "op": "div", "value": 2, "label": "Tempo glosado" } },
+    { "dist": 3120, "left": { "op": "add", "value": 12, "label": "Acordo trab." },  "right": { "op": "div", "value": 2, "label": "Fator previd." } }
+  ]
+}

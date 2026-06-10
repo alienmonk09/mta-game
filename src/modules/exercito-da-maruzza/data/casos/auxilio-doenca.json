@@ -1,0 +1,17 @@
+{
+  "id": "auxilio-doenca",
+  "name": "Auxílio-Doença do Seu João",
+  "tagline": "Incapacidade laboral provada por documentos",
+  "order": 2,
+  "start": 3,
+  "speed": 330,
+  "wall": 40,
+  "gates": [
+    { "dist": 520,  "left": { "op": "mul", "value": 2,  "label": "Laudo médico" },  "right": { "op": "div", "value": 2, "label": "Carência" } },
+    { "dist": 1040, "left": { "op": "add", "value": 6,  "label": "Atestado SUS" },  "right": { "op": "div", "value": 2, "label": "Perícia neg." } },
+    { "dist": 1560, "left": { "op": "mul", "value": 2,  "label": "CAT emitida" },   "right": { "op": "div", "value": 3, "label": "Alta indevida" } },
+    { "dist": 2080, "left": { "op": "add", "value": 8,  "label": "Receituário" },   "right": { "op": "sub", "value": 4, "label": "Perícia adiada" } },
+    { "dist": 2600, "left": { "op": "mul", "value": 2,  "label": "Exame INSS" },    "right": { "op": "div", "value": 2, "label": "Limbo previd." } },
+    { "dist": 3120, "left": { "op": "add", "value": 10, "label": "Quesitos" },      "right": { "op": "div", "value": 2, "label": "Cessação" } }
+  ]
+}

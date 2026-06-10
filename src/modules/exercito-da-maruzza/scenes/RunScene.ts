@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { getServices } from '../../../core/services';
 import type { ThemeManager } from '../../../core/services/ThemeManager';
+import type { RunResult } from '../../../core/types';
 import { getCaso, firstCasoId } from '../data/casos';
 import type { CasoData, GateOp, GatePair } from '../data/CasoData';
 import { Track } from '../systems/track';
@@ -8,6 +9,7 @@ import { applyOp, isGoodOp, opSign } from '../systems/operations';
 import { pickSide, gateOpFor } from '../systems/gates';
 import { resolveWall } from '../systems/wall';
 import { Crowd } from '../systems/Crowd';
+import { buildShareText } from '../systems/share';
 
 interface GateView {
   pair: GatePair;
@@ -24,6 +26,7 @@ export class RunScene extends Phaser.Scene {
   private crowd!: Crowd;
   private gateViews: GateView[] = [];
   private wall!: Phaser.GameObjects.Container;
+  private wallRect!: Phaser.GameObjects.Rectangle;
   private wallDist = 0;
   private countText!: Phaser.GameObjects.Text;
   private targetX = 0;
@@ -59,7 +62,7 @@ export class RunScene extends Phaser.Scene {
     // pista (fundo)
     this.add.rectangle(this.centerX, H / 2, laneW, H, themes.colorNum('accent.secondary', 0x6366f1), 0.06);
     // linha da multidão
-    this.add.rectangle(this.centerX, this.crowdY + 40, laneW, 2, 0xffffff, 0.12);
+    this.add.rectangle(this.centerX, this.crowdY + 40, laneW, 2, themes.colorNum('outline', 0xffffff), 0.12);
 
     // multidão
     this.crowd = new Crowd(
@@ -69,6 +72,7 @@ export class RunScene extends Phaser.Scene {
       caso.start,
       themes.colorNum('accent.primary', 0x22c55e),
       themes.colorNum('accent.secondary', 0x6366f1),
+      themes.colorNum('outline', 0xffffff),
     );
 
     // portões
@@ -80,11 +84,13 @@ export class RunScene extends Phaser.Scene {
 
     // muro
     this.wallDist = Math.max(...caso.gates.map((g) => g.dist)) + GAP_BEFORE_WALL;
-    const wallRect = this.add.rectangle(0, 0, laneW, 80, themes.colorNum('wall', 0x475569)).setStrokeStyle(4, 0xffffff, 0.3);
+    this.wallRect = this.add
+      .rectangle(0, 0, laneW, 80, themes.colorNum('wall', 0x475569))
+      .setStrokeStyle(4, themes.colorNum('outline', 0xffffff), 0.3);
     const wallTxt = this.add
-      .text(0, 0, `MURO\n${caso.wall}`, { fontFamily: 'Arial', fontSize: '30px', fontStyle: 'bold', color: '#ffffff', align: 'center' })
+      .text(0, 0, `MURO\n${caso.wall}`, { fontFamily: 'Arial', fontSize: '30px', fontStyle: 'bold', color: themes.color('outline', '#ffffff'), align: 'center' })
       .setOrigin(0.5);
-    this.wall = this.add.container(this.centerX, -300, [wallRect, wallTxt]);
+    this.wall = this.add.container(this.centerX, -300, [this.wallRect, wallTxt]);
 
     // HUD
     this.add.text(this.centerX, H * 0.02, caso.name, { fontFamily: 'Arial', fontSize: '22px', color: themes.color('text', '#e2e8f0') }).setOrigin(0.5, 0).setDepth(10);
@@ -95,18 +101,24 @@ export class RunScene extends Phaser.Scene {
     this.add.text(this.centerX, H * 0.145, 'PROVAS', { fontFamily: 'Arial', fontSize: '24px', color: themes.color('text.muted', '#94a3b8') }).setOrigin(0.5).setDepth(10);
 
     // input: arrasta o líder
+    const { audio } = getServices();
     const steer = (p: Phaser.Input.Pointer): void => {
       this.targetX = Phaser.Math.Clamp(p.x, this.laneLeft, this.laneRight);
     };
     this.input.on('pointermove', steer);
-    this.input.on('pointerdown', steer);
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
+      audio.unlock();
+      audio.startMusic();
+      steer(p);
+    });
   }
 
   private makeGate(op: GateOp, cx: number, w: number, themes: ThemeManager): Phaser.GameObjects.Container {
     const color = isGoodOp(op) ? themes.colorNum('gate.good', 0x22c55e) : themes.colorNum('gate.bad', 0xef4444);
     const rect = this.add.rectangle(0, 0, w, 66, color, 0.85);
-    const sign = this.add.text(0, -8, `${opSign(op)}${op.value}`, { fontFamily: 'Arial', fontSize: '36px', fontStyle: 'bold', color: '#ffffff' }).setOrigin(0.5);
-    const label = this.add.text(0, 24, op.label, { fontFamily: 'Arial', fontSize: '15px', color: '#ffffff' }).setOrigin(0.5);
+    const ink = themes.color('outline', '#ffffff');
+    const sign = this.add.text(0, -8, `${opSign(op)}${op.value}`, { fontFamily: 'Arial', fontSize: '36px', fontStyle: 'bold', color: ink }).setOrigin(0.5);
+    const label = this.add.text(0, 24, op.label, { fontFamily: 'Arial', fontSize: '15px', color: ink }).setOrigin(0.5);
     return this.add.container(cx, -300, [rect, sign, label]);
   }
 
@@ -126,10 +138,16 @@ export class RunScene extends Phaser.Scene {
         gv.resolved = true;
         const side = pickSide(this.crowd.x, this.centerX);
         const op = gateOpFor(gv.pair, side);
+        const good = isGoodOp(op);
         this.crowd.setCount(applyOp(this.crowd.count, op));
         this.countText.setText(`${this.crowd.count}`);
-        (side === 'left' ? gv.left : gv.right).setAlpha(0.25);
-        (side === 'left' ? gv.right : gv.left).setAlpha(0.12);
+        this.popCount(good);
+        getServices().audio.play(good ? 'good' : 'bad');
+        const chosen = side === 'left' ? gv.left : gv.right;
+        const other = side === 'left' ? gv.right : gv.left;
+        chosen.setAlpha(0.3);
+        other.setAlpha(0.12);
+        this.tweens.add({ targets: chosen, scaleX: 1.15, scaleY: 1.15, duration: 90, yoyo: true });
       }
     }
 
@@ -140,44 +158,73 @@ export class RunScene extends Phaser.Scene {
     }
   }
 
+  /** pop no contador de provas: cor + escala conforme o portão foi bom/ruim */
+  private popCount(good: boolean): void {
+    const { themes } = getServices();
+    const baseColor = themes.color('accent.primary', '#22c55e');
+    this.countText.setColor(good ? themes.color('gate.good', '#22c55e') : themes.color('gate.bad', '#ef4444'));
+    this.tweens.add({
+      targets: this.countText,
+      scale: good ? 1.3 : 0.8,
+      duration: 120,
+      yoyo: true,
+      ease: 'Back.easeOut',
+      onComplete: () => this.countText.setColor(baseColor),
+    });
+  }
+
   private end(won: boolean): void {
     this.ended = true;
-    const { themes } = getServices();
-    const W = this.scale.width;
-    const H = this.scale.height;
+    const { themes, audio } = getServices();
 
-    this.add.rectangle(W / 2, H / 2, W, H, 0x000000, 0.62).setDepth(20);
-    this.add
-      .text(W / 2, H * 0.4, won ? 'BENEFÍCIO\nCONCEDIDO! 🎉' : 'O MURO\nSEGUROU 😞', {
-        fontFamily: 'Arial',
-        fontSize: '60px',
-        fontStyle: 'bold',
-        align: 'center',
-        color: won ? themes.color('gate.good', '#22c55e') : themes.color('gate.bad', '#ef4444'),
-      })
-      .setOrigin(0.5)
-      .setDepth(21);
-    this.add
-      .text(W / 2, H * 0.56, `Provas: ${this.crowd.count}   ·   Muro: ${this.caso.wall}`, {
-        fontFamily: 'Arial',
-        fontSize: '28px',
-        color: themes.color('text', '#e2e8f0'),
-      })
-      .setOrigin(0.5)
-      .setDepth(21);
+    this.cameras.main.shake(won ? 380 : 260, won ? 0.012 : 0.008);
 
-    const again = this.add
-      .text(W / 2, H * 0.7, '↺ Jogar de novo', {
-        fontFamily: 'Arial',
-        fontSize: '34px',
-        fontStyle: 'bold',
-        color: themes.color('bg.base', '#0b1020'),
-        backgroundColor: themes.color('accent.primary', '#22c55e'),
-        padding: { x: 28, y: 14 },
-      })
-      .setOrigin(0.5)
-      .setDepth(21)
-      .setInteractive({ useHandCursor: true });
-    again.once('pointerdown', () => this.scene.start('MenuScene'));
+    if (won) {
+      audio.play('break');
+      this.breakWall(themes.colorNum('wall', 0x475569));
+      // a multidão avança triunfante
+      this.tweens.add({ targets: this.crowd.container, y: this.crowd.container.y - 80, duration: 350, ease: 'Quad.easeOut' });
+      this.time.delayedCall(160, () => audio.play('win'));
+    } else {
+      audio.play('lose');
+      // muro pisca e segura; multidão recua
+      this.tweens.add({ targets: this.wall, scaleY: 1.12, duration: 90, yoyo: true, repeat: 2 });
+      this.tweens.add({ targets: this.crowd.container, y: this.crowd.container.y + 36, duration: 220, yoyo: true, ease: 'Quad.easeOut' });
+    }
+
+    const result: RunResult = {
+      won,
+      score: this.crowd.count,
+      start: this.caso.start,
+      wall: this.caso.wall,
+      casoId: this.caso.id,
+      casoName: this.caso.name,
+      shareText: '',
+    };
+    result.shareText = buildShareText(result);
+
+    this.time.delayedCall(900, () => this.scene.start('ResultScene', { result }));
+  }
+
+  /** estilhaça o muro em fragmentos que voam pra fora */
+  private breakWall(color: number): void {
+    const { x, y } = this.wall;
+    const laneW = this.laneRight - this.laneLeft;
+    this.wall.setVisible(false);
+    const pieces = 9;
+    for (let i = 0; i < pieces; i++) {
+      const px = x - laneW / 2 + (laneW / pieces) * (i + 0.5);
+      const frag = this.add.rectangle(px, y, laneW / pieces - 4, 64, color).setDepth(15);
+      this.tweens.add({
+        targets: frag,
+        x: px + Phaser.Math.Between(-180, 180),
+        y: y - Phaser.Math.Between(120, 360),
+        angle: Phaser.Math.Between(-220, 220),
+        alpha: 0,
+        duration: 700,
+        ease: 'Cubic.easeOut',
+        onComplete: () => frag.destroy(),
+      });
+    }
   }
 }

@@ -21,10 +21,11 @@ export class Crowd {
     count: number,
     private color: number,
     leaderColor: number,
+    outlineColor = 0xffffff,
   ) {
     this.count = count;
     this.container = scene.add.container(x, y);
-    const leader = scene.add.circle(0, 0, 16, leaderColor).setStrokeStyle(3, 0xffffff);
+    const leader = scene.add.circle(0, 0, 16, leaderColor).setStrokeStyle(3, outlineColor);
     this.container.add(leader);
     this.render();
   }
@@ -38,8 +39,23 @@ export class Crowd {
   }
 
   setCount(n: number): void {
+    const grew = n >= this.count;
     this.count = Math.max(0, n);
     this.render();
+    this.pulse(grew);
+  }
+
+  /** feedback tátil: pop ao crescer, encolhe ao diminuir */
+  pulse(grew: boolean): void {
+    const s = grew ? 1.18 : 0.86;
+    this.scene.tweens.add({
+      targets: this.container,
+      scaleX: s,
+      scaleY: s,
+      duration: 110,
+      yoyo: true,
+      ease: 'Quad.easeOut',
+    });
   }
 
   private render(): void {

@@ -7,12 +7,21 @@
     "gate.good": "#22c55e",
     "gate.bad": "#ef4444",
     "wall": "#475569",
+    "outline": "#ffffff",
     "text": "#e2e8f0",
     "text.muted": "#94a3b8"
   },
   "copy": {
     "title": "Exército da Maruzza",
     "subtitle": "Junte as provas e derrube o muro do INSS",
-    "play": "▶ JOGAR"
+    "play": "▶ JOGAR",
+    "result.win": "MURO DERRUBADO! 🎉",
+    "result.lose": "O MURO SEGUROU 😤",
+    "card.brand": "EXÉRCITO DA MARUZZA",
+    "card.subtitle": "👵 segurados ⚖️ vs o muro do INSS",
+    "card.metric": "PROVAS",
+    "card.viral": "Bate meu recorde 👵⚖️",
+    "card.footnote": "junte provas e derrube o muro do INSS",
+    "card.fileName": "exercito-da-maruzza.png"
   }
 }

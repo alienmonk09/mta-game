@@ -19,8 +19,8 @@
 |---|---|
 | 0 — Fundação | ✅ concluída (scaffold modular, contratos, services, tema flat, menu bootável) |
 | 1 — MVP jogável | ✅ concluída (crowd-runner jogável, 1 caso BPC) — verificado: typecheck + 16 testes + build + smoke headless. Screenshot: `docs/screens/fase1-runscene.png` |
-| 2 — Loop viral | ⏳ próxima |
-| 3 — Beleza & acessibilidade | ⬜ |
+| 2 — Loop viral | ✅ concluída (ciclo jogar→ganhar→compartilhar: ResultScene + ShareCard canvas, recorde, 5 casos, juice + áudio sintetizado, seletor de casos) — verificado: typecheck + 46 testes + build + smoke + review adversarial. Screenshots: `docs/screens/fase2-{menu,run,card}.png` |
+| 3 — Beleza & acessibilidade | ⏳ próxima |
 | 4 — Skin Bumba meu boi | ⬜ |
 | 5 — Hub & expansão | ⬜ |
 
@@ -169,11 +169,15 @@ Cada fase entrega algo jogável/verificável. ⚙️ = sistemas, 🎨 = arte, �
 - **Entregue:** joga 1 caso do início ao "concedido/segurou". Verificado: typecheck + 16 testes +
   build + **smoke headless** (boot→RunScene sem erro) + screenshot (`docs/screens/fase1-runscene.png`).
 
-### Fase 2 — Loop viral 🚀📦
-- `ResultScene` + `ShareCard` (canvas → imagem → compartilhar/baixar).
-- Recorde local (`Persistence`), 3–5 casos (BPC, auxílio-doença, aposentadoria rural/urbana).
-- `tweens`/juice: multidão crescendo, muro arrombando, confete. `AudioManager` (sfx + trilha + mute).
-- **Marco:** ciclo completo jogar → ganhar → compartilhar card. É o produto viral mínimo.
+### Fase 2 — Loop viral 🚀📦 ✅
+- `ResultScene` + `ShareCard` (canvas → imagem → compartilhar/baixar). ShareCard é **genérico** (núcleo
+  não conhece o módulo); a copy do card vem do `theme.json` e o módulo monta `CardContent` (`systems/card.ts`).
+- Recorde local (`Persistence`), **5 casos** (BPC, auxílio-doença, aposentadoria rural/urbana) com seletor no menu.
+- `tweens`/juice: multidão pulsando, muro estilhaçando, confete, camera shake. `AudioManager` real
+  (SFX sintetizados via Web Audio + trilha ambiente + mute persistido, **sem arquivos de asset**).
+- **Marco atingido:** ciclo completo jogar → ganhar → compartilhar card. Produto viral mínimo entregue.
+- Copy enquadrada como **jogo** (nunca veredito jurídico — cuidado OAB): vitória = "MURO DERRUBADO!",
+  travada por teste (`copy-oab.test.ts`). Conteúdo balanceado por simulador puro (`balance.ts`) + testes.
 
 ### Fase 3 — Beleza & acessibilidade 🎨
 - Arte flat final (personagens, fundos, vilão INSS), `game-ui-design` no HUD.

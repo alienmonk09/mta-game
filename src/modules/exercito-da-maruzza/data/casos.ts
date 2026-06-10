@@ -16,12 +16,19 @@ export function getCaso(id: string): CasoData | undefined {
   return registry[id];
 }
 
+/** Todos os casos ordenados por dificuldade (campo `order`), depois por nome. */
+export function allCasos(): CasoData[] {
+  return Object.values(registry).sort(
+    (a, b) => (a.order ?? 999) - (b.order ?? 999) || a.name.localeCompare(b.name, 'pt-BR'),
+  );
+}
+
 export function firstCasoId(): string {
-  const ids = Object.keys(registry);
-  if (ids.length === 0) throw new Error('Nenhum caso cadastrado em data/casos/');
-  return ids[0];
+  const casos = allCasos();
+  if (casos.length === 0) throw new Error('Nenhum caso cadastrado em data/casos/');
+  return casos[0].id;
 }
 
 export function allCasoIds(): string[] {
-  return Object.keys(registry);
+  return allCasos().map((c) => c.id);
 }

@@ -19,6 +19,10 @@ export interface GatePair {
 export interface CasoData {
   id: string;
   name: string;
+  /** frase curta de sabor (subtítulo no menu) */
+  tagline?: string;
+  /** ordem de exibição no menu (menor = primeiro/mais fácil) */
+  order?: number;
   /** tamanho inicial do exército */
   start: number;
   /** velocidade de scroll (px/s) */

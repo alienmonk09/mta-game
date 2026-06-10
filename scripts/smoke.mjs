@@ -77,6 +77,43 @@ try {
   if (!inRun.includes('RunScene')) throw new Error(`RunScene não ativa (ativas: ${inRun.join(', ')})`);
   console.log(`RunScene rodando · cenas ativas: ${inRun.join(', ')}`);
 
+  // Fase 2: entra na ResultScene e valida a geração do card viral (Canvas → PNG)
+  const RESULT = {
+    won: true,
+    score: 187,
+    start: 1,
+    wall: 60,
+    casoId: 'bpc',
+    casoName: 'BPC-LOAS da Dona Cida',
+    shareText: 'smoke',
+  };
+  const CARD = {
+    won: true,
+    brand: 'EXÉRCITO DA MARUZZA',
+    subtitle: 'smoke',
+    status: 'MURO DERRUBADO! 🎉',
+    metric: '187',
+    metricLabel: 'PROVAS',
+    detail: 'de 1 a 187 provas · muro 60',
+    viral: 'Bate meu recorde',
+    footnote: 'junte provas e derrube o muro',
+    crowdCount: 40,
+    fileName: 'smoke.png',
+    shareTitle: 'smoke',
+    shareText: 'smoke',
+  };
+  await page.evaluate((r) => window.__MTA_GAME__.scene.start('ResultScene', { result: r }), RESULT);
+  await sleep(1500);
+  const result = await page.evaluate((card) => {
+    const scenes = window.__MTA_GAME__.scene.getScenes(true).map((s) => s.scene.key);
+    const svc = window.__MTA_SERVICES__;
+    const dataUrl = svc && svc.share ? svc.share.renderCardDataURL(card) : '';
+    return { scenes, cardOk: typeof dataUrl === 'string' && dataUrl.startsWith('data:image/png'), cardLen: dataUrl.length };
+  }, CARD);
+  if (!result.scenes.includes('ResultScene')) throw new Error(`ResultScene não ativa (ativas: ${result.scenes.join(', ')})`);
+  if (!result.cardOk) throw new Error('ShareCard.renderCardDataURL não gerou PNG');
+  console.log(`ResultScene ok · card viral PNG gerado (${result.cardLen} chars dataURL)`);
+
   await page.screenshot({ path: SHOT });
   console.log(`screenshot: ${SHOT}`);
 
