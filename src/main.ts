@@ -6,7 +6,14 @@ import exercitoModule from './modules/exercito-da-maruzza';
 
 async function bootstrap(): Promise<void> {
   const services = createServices();
-  await services.themes.load('flat-default'); // skin inicial (cartoon flat)
+  // skin persistida (default cartoon flat); cai pro flat se a skin salva falhar
+  const savedSkin = services.persistence.getString('skin', 'flat-default');
+  try {
+    await services.themes.load(savedSkin);
+  } catch {
+    await services.themes.load('flat-default');
+    services.persistence.setString('skin', 'flat-default'); // auto-cura: não insiste numa skin inválida a cada boot
+  }
 
   const registry = new ModuleRegistry();
   registry.register(exercitoModule);

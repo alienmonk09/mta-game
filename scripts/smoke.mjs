@@ -114,6 +114,19 @@ try {
   if (!result.cardOk) throw new Error('ShareCard.renderCardDataURL não gerou PNG');
   console.log(`ResultScene ok · card viral PNG gerado (${result.cardLen} chars dataURL)`);
 
+  // Fase 4: troca de skin a quente (bumba-boi) — gameplay intacto, sem erro de runtime
+  const skin = await page.evaluate(async () => {
+    const svc = window.__MTA_SERVICES__;
+    await svc.themes.load('bumba-boi');
+    window.__MTA_GAME__.scene.start('RunScene', { casoId: 'bpc' });
+    return svc.themes.id;
+  });
+  await sleep(1200);
+  const boiScenes = await page.evaluate(() => window.__MTA_GAME__.scene.getScenes(true).map((s) => s.scene.key));
+  if (skin !== 'bumba-boi') throw new Error(`skin não trocou (ativa: ${skin})`);
+  if (!boiScenes.includes('RunScene')) throw new Error(`RunScene não ativa após troca de skin (ativas: ${boiScenes.join(', ')})`);
+  console.log(`skin bumba-boi ok · RunScene rodando com a skin trocada`);
+
   await page.screenshot({ path: SHOT });
   console.log(`screenshot: ${SHOT}`);
 

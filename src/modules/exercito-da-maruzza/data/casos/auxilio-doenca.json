@@ -2,7 +2,7 @@
   "id": "auxilio-doenca",
   "name": "Auxílio-Doença do Seu João",
   "tagline": "Incapacidade laboral provada por documentos",
-  "order": 2,
+  "order": 4,
   "start": 3,
   "speed": 330,
   "wall": 40,

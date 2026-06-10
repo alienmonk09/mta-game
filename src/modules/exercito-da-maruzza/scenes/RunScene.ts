@@ -9,7 +9,11 @@ import { applyOp, isGoodOp, opSign } from '../systems/operations';
 import { pickSide, gateOpFor } from '../systems/gates';
 import { resolveWall } from '../systems/wall';
 import { Crowd } from '../systems/Crowd';
+import { Scenery } from '../systems/Scenery';
+import { Villain } from '../systems/Villain';
 import { buildShareText } from '../systems/share';
+import { effectiveSpeed, isCalmMode } from '../systems/settings';
+import { shouldShowOnboarding, markOnboarded, showOnboarding } from '../systems/onboarding';
 
 interface GateView {
   pair: GatePair;
@@ -19,11 +23,14 @@ interface GateView {
 }
 
 const GAP_BEFORE_WALL = 700;
+const WALL_H = 80; // altura do muro; o vilão "pisa" no topo (wall.y - WALL_H/2)
 
 export class RunScene extends Phaser.Scene {
   private caso!: CasoData;
   private track!: Track;
   private crowd!: Crowd;
+  private scenery!: Scenery;
+  private villain!: Villain;
   private gateViews: GateView[] = [];
   private wall!: Phaser.GameObjects.Container;
   private wallRect!: Phaser.GameObjects.Rectangle;
@@ -35,6 +42,8 @@ export class RunScene extends Phaser.Scene {
   private laneRight = 0;
   private centerX = 0;
   private ended = false;
+  /** false enquanto o onboarding está na tela: congela a pista até o 1º toque */
+  private running = true;
 
   constructor() {
     super('RunScene');
@@ -45,13 +54,16 @@ export class RunScene extends Phaser.Scene {
     const caso = getCaso(data?.casoId ?? firstCasoId());
     if (!caso) throw new Error(`Caso "${data?.casoId}" não encontrado`);
     this.caso = caso;
-    this.track = new Track(caso.speed);
+    const calm = isCalmMode(getServices().persistence);
+    this.track = new Track(effectiveSpeed(caso.speed, calm));
     this.gateViews = [];
     this.ended = false;
+    this.running = true;
 
     const W = this.scale.width;
     const H = this.scale.height;
     this.cameras.main.setBackgroundColor(themes.color('bg.base', '#0b1020'));
+    this.scenery = new Scenery(this, W, H);
     this.laneLeft = W * 0.12;
     this.laneRight = W * 0.88;
     this.centerX = W / 2;
@@ -71,7 +83,6 @@ export class RunScene extends Phaser.Scene {
       this.crowdY,
       caso.start,
       themes.colorNum('accent.primary', 0x22c55e),
-      themes.colorNum('accent.secondary', 0x6366f1),
       themes.colorNum('outline', 0xffffff),
     );
 
@@ -85,24 +96,32 @@ export class RunScene extends Phaser.Scene {
     // muro
     this.wallDist = Math.max(...caso.gates.map((g) => g.dist)) + GAP_BEFORE_WALL;
     this.wallRect = this.add
-      .rectangle(0, 0, laneW, 80, themes.colorNum('wall', 0x475569))
+      .rectangle(0, 0, laneW, WALL_H, themes.colorNum('wall', 0x475569))
       .setStrokeStyle(4, themes.colorNum('outline', 0xffffff), 0.3);
+    // faixa de topo (capa de concreto) — leve volume
+    const wallTop = this.add.rectangle(0, -WALL_H / 2 + 6, laneW, 14, themes.colorNum('wall.top', 0x64748b));
     const wallTxt = this.add
-      .text(0, 0, `MURO\n${caso.wall}`, { fontFamily: 'Arial', fontSize: '30px', fontStyle: 'bold', color: themes.color('outline', '#ffffff'), align: 'center' })
+      .text(0, 6, `${themes.text('wall.label', 'MURO')}\n${caso.wall}`, { fontFamily: 'Arial', fontSize: '30px', fontStyle: 'bold', color: themes.color('outline', '#ffffff'), align: 'center' })
       .setOrigin(0.5);
-    this.wall = this.add.container(this.centerX, -300, [this.wallRect, wallTxt]);
+    this.wall = this.add.container(this.centerX, -300, [this.wallRect, wallTop, wallTxt]);
 
-    // HUD
+    // vilão INSS em cima do muro (chefe de fase burocrático)
+    this.villain = new Villain(this, this.centerX, -300 - WALL_H / 2);
+
+    // HUD — barra no topo: os portões emergem por baixo dela (legibilidade)
+    this.add.rectangle(this.centerX, 0, W, H * 0.17, themes.colorNum('bg.base', 0x0b1020), 0.92).setOrigin(0.5, 0).setDepth(9);
+    this.add.rectangle(this.centerX, H * 0.17, W, 2, themes.colorNum('outline', 0xffffff), 0.15).setOrigin(0.5, 0.5).setDepth(9);
     this.add.text(this.centerX, H * 0.02, caso.name, { fontFamily: 'Arial', fontSize: '22px', color: themes.color('text', '#e2e8f0') }).setOrigin(0.5, 0).setDepth(10);
     this.countText = this.add
       .text(this.centerX, H * 0.08, `${caso.start}`, { fontFamily: 'Arial', fontSize: '76px', fontStyle: 'bold', color: themes.color('accent.primary', '#22c55e') })
       .setOrigin(0.5)
       .setDepth(10);
-    this.add.text(this.centerX, H * 0.145, 'PROVAS', { fontFamily: 'Arial', fontSize: '24px', color: themes.color('text.muted', '#94a3b8') }).setOrigin(0.5).setDepth(10);
+    this.add.text(this.centerX, H * 0.145, themes.text('card.metric', 'PROVAS'), { fontFamily: 'Arial', fontSize: '24px', color: themes.color('text.muted', '#94a3b8') }).setOrigin(0.5).setDepth(10);
 
     // input: arrasta o líder
     const { audio } = getServices();
     const steer = (p: Phaser.Input.Pointer): void => {
+      if (!this.running) return; // não move a turma enquanto o onboarding congela a pista
       this.targetX = Phaser.Math.Clamp(p.x, this.laneLeft, this.laneRight);
     };
     this.input.on('pointermove', steer);
@@ -111,6 +130,18 @@ export class RunScene extends Phaser.Scene {
       audio.startMusic();
       steer(p);
     });
+
+    // onboarding 1-toque na primeira partida: congela a pista até dispensar
+    const { persistence } = getServices();
+    if (shouldShowOnboarding(persistence)) {
+      this.running = false;
+      showOnboarding(this, () => {
+        markOnboarded(persistence);
+        this.running = true;
+        audio.unlock();
+        audio.startMusic();
+      });
+    }
   }
 
   private makeGate(op: GateOp, cx: number, w: number, themes: ThemeManager): Phaser.GameObjects.Container {
@@ -123,8 +154,9 @@ export class RunScene extends Phaser.Scene {
   }
 
   override update(_time: number, delta: number): void {
-    if (this.ended) return;
+    if (this.ended || !this.running) return;
     this.track.update(delta);
+    this.scenery.update(this.track.traveled);
 
     // a multidão segue o ponteiro suavemente
     this.crowd.setX(Phaser.Math.Linear(this.crowd.x, this.targetX, 0.15));
@@ -151,8 +183,9 @@ export class RunScene extends Phaser.Scene {
       }
     }
 
-    // muro
+    // muro (+ vilão em cima dele: topo = wall.y - WALL_H/2)
     this.wall.y = this.track.screenY(this.wallDist, this.crowdY);
+    this.villain.setY(this.wall.y - WALL_H / 2);
     if (this.track.passed(this.wallDist)) {
       this.end(resolveWall(this.crowd.count, this.caso.wall));
     }
@@ -178,6 +211,7 @@ export class RunScene extends Phaser.Scene {
     const { themes, audio } = getServices();
 
     this.cameras.main.shake(won ? 380 : 260, won ? 0.012 : 0.008);
+    this.villain.react(won);
 
     if (won) {
       audio.play('break');
@@ -201,7 +235,7 @@ export class RunScene extends Phaser.Scene {
       casoName: this.caso.name,
       shareText: '',
     };
-    result.shareText = buildShareText(result);
+    result.shareText = buildShareText(result, themes.text('share.emoji', '👵⚖️'));
 
     this.time.delayedCall(900, () => this.scene.start('ResultScene', { result }));
   }

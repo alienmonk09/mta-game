@@ -15,4 +15,24 @@ export class Persistence {
     }
     return false;
   }
+
+  /** lê flag booleana genérica (default false). */
+  getFlag(key: string): boolean {
+    return localStorage.getItem(`${this.prefix}flag:${key}`) === '1';
+  }
+
+  /** grava flag booleana genérica. */
+  setFlag(key: string, value: boolean): void {
+    localStorage.setItem(`${this.prefix}flag:${key}`, value ? '1' : '0');
+  }
+
+  /** lê string genérica (ex: skin ativa) com fallback. */
+  getString(key: string, fallback = ''): string {
+    return localStorage.getItem(`${this.prefix}str:${key}`) ?? fallback;
+  }
+
+  /** grava string genérica. */
+  setString(key: string, value: string): void {
+    localStorage.setItem(`${this.prefix}str:${key}`, value);
+  }
 }

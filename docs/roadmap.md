@@ -20,9 +20,9 @@
 | 0 — Fundação | ✅ concluída (scaffold modular, contratos, services, tema flat, menu bootável) |
 | 1 — MVP jogável | ✅ concluída (crowd-runner jogável, 1 caso BPC) — verificado: typecheck + 16 testes + build + smoke headless. Screenshot: `docs/screens/fase1-runscene.png` |
 | 2 — Loop viral | ✅ concluída (ciclo jogar→ganhar→compartilhar: ResultScene + ShareCard canvas, recorde, 5 casos, juice + áudio sintetizado, seletor de casos) — verificado: typecheck + 46 testes + build + smoke + review adversarial. Screenshots: `docs/screens/fase2-{menu,run,card}.png` |
-| 3 — Beleza & acessibilidade | ⏳ próxima |
-| 4 — Skin Bumba meu boi | ⬜ |
-| 5 — Hub & expansão | ⬜ |
+| 3 — Beleza & acessibilidade | ✅ concluída (arte flat procedural zero-asset: multidão de pessoinhas, líder Maruzza, vilão INSS, cenário em parallax, muro+HUD; onboarding 1-toque, modo calmo, alto contraste; copy/cores 100% em tokens) — verificado: typecheck + 50 testes + build + smoke + review adversarial. Screenshots: `docs/screens/fase3-{menu,onboarding,run,wall}.png` |
+| 4 — Skin Bumba meu boi | ✅ concluída (`themes/bumba-boi/` — paleta maranhense nos mesmos tokens; seletor flat↔boi a quente, persistido; gameplay intacto, provado por parity + OAB cross-skin + smoke). Screenshots: `docs/screens/fase4-boi-{menu,run,wall}.png` |
+| 5 — Hub & expansão | ⏳ próxima |
 
 **Definição de pronto (por fase):** `npm run typecheck && npm test && npm run build && npm run smoke` verdes.
 
@@ -172,23 +172,37 @@ Cada fase entrega algo jogável/verificável. ⚙️ = sistemas, 🎨 = arte, �
 ### Fase 2 — Loop viral 🚀📦 ✅
 - `ResultScene` + `ShareCard` (canvas → imagem → compartilhar/baixar). ShareCard é **genérico** (núcleo
   não conhece o módulo); a copy do card vem do `theme.json` e o módulo monta `CardContent` (`systems/card.ts`).
-- Recorde local (`Persistence`), **5 casos** (BPC, auxílio-doença, aposentadoria rural/urbana) com seletor no menu.
+- Recorde local (`Persistence`), casos data-driven (BPC, auxílio-doença, aposentadoria rural/urbana;
+  + caso-tutorial salário-maternidade adicionado na auditoria pós-Fase 4 → **5 casos**) com seletor no menu.
 - `tweens`/juice: multidão pulsando, muro estilhaçando, confete, camera shake. `AudioManager` real
   (SFX sintetizados via Web Audio + trilha ambiente + mute persistido, **sem arquivos de asset**).
 - **Marco atingido:** ciclo completo jogar → ganhar → compartilhar card. Produto viral mínimo entregue.
 - Copy enquadrada como **jogo** (nunca veredito jurídico — cuidado OAB): vitória = "MURO DERRUBADO!",
   travada por teste (`copy-oab.test.ts`). Conteúdo balanceado por simulador puro (`balance.ts`) + testes.
 
-### Fase 3 — Beleza & acessibilidade 🎨
-- Arte flat final (personagens, fundos, vilão INSS), `game-ui-design` no HUD.
-- Acessibilidade pro idoso: alvos grandes, alto contraste, texto legível, onboarding 1-toque,
-  modo sem-tempo. Tuning de dificuldade e curva de crescimento.
-- **Marco:** "bonito e fácil" de verdade no celular do público-alvo.
+### Fase 3 — Beleza & acessibilidade 🎨 ✅
+- Arte flat **procedural** (zero-asset, como o áudio sintetizado): `systems/figures.ts` gera texturas
+  de pessoinhas (segurado/líder Maruzza/vilão INSS) via `Graphics.generateTexture`, recoloridas por
+  tokens do tema. `Crowd` virou gente; `Scenery` (céu/chão/colunas em parallax); `Villain` no muro;
+  barra de HUD legível (`game-ui-design`).
+- Acessibilidade pro idoso: onboarding 1-toque (ensina **+/× vs −/÷**, à prova de daltonismo),
+  **modo calmo** (velocidade ×0.6, persistido) no menu, alto contraste, alvos grandes.
+- Arquitetura: copy **e** cores da UI nova 100% via tokens do tema → skin `bumba-boi` (Fase 4)
+  troca tudo sem tocar em código. Produzida em **workflow paralelo** (4 agentes / arquivos disjuntos
+  sobre o contrato `figures.ts`).
+- **Marco atingido:** "bonito e fácil" de verdade no celular do público-alvo.
 
-### Fase 4 — Skin Bumba meu boi 🐂🎨
-- Implementar o tema `bumba-boi` (paleta, motivos, personagens, sfx) — ver **§7**.
-- Seletor de skin (flat ↔ boi). Validar que **só dados mudam**, gameplay intacto.
-- **Marco:** prova viva do sistema de skins + identidade maranhense.
+### Fase 4 — Skin Bumba meu boi 🐂🎨 ✅
+- `public/themes/bumba-boi/theme.json`: paleta maranhense (veludo, ouro de canutilho, jewel tones de
+  festa, magenta da Ama, renda) nos **mesmos tokens lógicos** do §2.2; copy "cordão encantado", OAB-safe.
+  As figuras procedurais (`figures.ts`) **recolorem sozinhas** — followers dourados, Maruzza magenta,
+  vilão INSS mantido frio/cinza (fora do vocabulário do boi, conforme §7).
+- Seletor de skin no menu (flat ↔ boi): `themes.load` a quente + persistência (`Persistence` string +
+  `main.ts` boota a skin salva) + `scene.restart`.
+- **Validado que só dados mudam:** teste de parity (toda skin preenche todos os tokens), OAB cross-skin
+  (guarda anti-veredito agora cobre todas as skins) e smoke headless que troca pra boi e roda sem erro.
+- **Marco atingido:** prova viva do sistema de skins + identidade maranhense. (Motivos profundos —
+  fitas, penas, azulejo bordado — ficam como polish futuro; o contrato de cor/copy está provado.)
 
 ### Fase 5 — Hub & expansão 🏛️
 - `HubScene` ("Escritório da Maruzza") hospedando módulos via `ModuleRegistry`; *Exército* = módulo 1.
