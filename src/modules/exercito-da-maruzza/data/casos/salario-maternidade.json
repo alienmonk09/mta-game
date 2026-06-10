@@ -1,0 +1,15 @@
+{
+  "id": "salario-maternidade",
+  "name": "Salário-Maternidade da Dona Lúcia",
+  "tagline": "Provar o trabalho rural fortalece o caso da mãe",
+  "order": 1,
+  "start": 5,
+  "speed": 300,
+  "wall": 20,
+  "gates": [
+    { "dist": 520,  "left": { "op": "mul", "value": 2,  "label": "Nota sindicato" }, "right": { "op": "sub", "value": 2, "label": "Sem prova" } },
+    { "dist": 1040, "left": { "op": "add", "value": 10, "label": "Autodeclaração" }, "right": { "op": "div", "value": 2, "label": "Cadastro velho" } },
+    { "dist": 1560, "left": { "op": "mul", "value": 2,  "label": "Bloco produtor" }, "right": { "op": "sub", "value": 5, "label": "Período curto" } },
+    { "dist": 2080, "left": { "op": "add", "value": 12, "label": "Testemunha" },     "right": { "op": "div", "value": 2, "label": "Faltou doc" } }
+  ]
+}

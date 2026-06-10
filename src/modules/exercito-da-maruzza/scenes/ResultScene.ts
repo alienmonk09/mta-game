@@ -57,7 +57,7 @@ export class ResultScene extends Phaser.Scene {
       onComplete: () => numberText.setText(result.score.toLocaleString('pt-BR')),
     });
     this.add
-      .text(W / 2, H * 0.41, 'PROVAS', { fontFamily: 'Arial, sans-serif', fontSize: '26px', color: themes.color('text.muted', '#94a3b8') })
+      .text(W / 2, H * 0.41, themes.text('card.metric', 'PROVAS'), { fontFamily: 'Arial, sans-serif', fontSize: '26px', color: themes.color('text.muted', '#94a3b8') })
       .setOrigin(0.5)
       .setDepth(5);
 
@@ -78,27 +78,27 @@ export class ResultScene extends Phaser.Scene {
     // recorde
     if (isRecord) {
       const badge = this.add
-        .text(W / 2, H * 0.585, '🏆 NOVO RECORDE!', { fontFamily: 'Arial, sans-serif', fontSize: '34px', fontStyle: 'bold', color: themes.color('accent.primary', '#22c55e') })
+        .text(W / 2, H * 0.585, themes.text('result.record', '🏆 NOVO RECORDE!'), { fontFamily: 'Arial, sans-serif', fontSize: '34px', fontStyle: 'bold', color: themes.color('accent.primary', '#22c55e') })
         .setOrigin(0.5)
         .setDepth(5);
       this.tweens.add({ targets: badge, scale: 1.12, duration: 520, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     } else {
       this.add
-        .text(W / 2, H * 0.585, `🏆 Recorde: ${best.toLocaleString('pt-BR')}`, { fontFamily: 'Arial, sans-serif', fontSize: '26px', color: themes.color('text.muted', '#94a3b8') })
+        .text(W / 2, H * 0.585, `${themes.text('result.recordPrefix', '🏆 Recorde:')} ${best.toLocaleString('pt-BR')}`, { fontFamily: 'Arial, sans-serif', fontSize: '26px', color: themes.color('text.muted', '#94a3b8') })
         .setOrigin(0.5)
         .setDepth(5);
     }
 
     // ações
-    makeButton(this, W / 2, H * 0.7, '📤 Compartilhar', () => void share.share(buildCardContent(result)), {
+    makeButton(this, W / 2, H * 0.7, themes.text('btn.share', '📤 Compartilhar'), () => void share.share(buildCardContent(result)), {
       bg: 'accent.primary',
       fg: 'bg.base',
     }).setDepth(5);
-    makeButton(this, W / 2, H * 0.79, '↺ Jogar de novo', () => this.scene.start('RunScene', { casoId: result.casoId }), {
+    makeButton(this, W / 2, H * 0.79, themes.text('btn.replay', '↺ Jogar de novo'), () => this.scene.start('RunScene', { casoId: result.casoId }), {
       bg: 'accent.secondary',
       fg: 'text',
     }).setDepth(5);
-    makeButton(this, W / 2, H * 0.875, '🏠 Menu', () => this.scene.start('MenuScene'), {
+    makeButton(this, W / 2, H * 0.875, themes.text('btn.menu', '🏠 Menu'), () => this.scene.start('MenuScene'), {
       bg: 'wall',
       fg: 'text',
     }).setDepth(5);

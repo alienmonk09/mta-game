@@ -11,7 +11,8 @@ export function statusLabel(won: boolean): string {
 }
 
 export function summaryLine(r: RunResult): string {
-  return `de ${r.start} a ${r.score.toLocaleString('pt-BR')} provas  ·  muro ${r.wall}`;
+  const n = (v: number): string => v.toLocaleString('pt-BR');
+  return `de ${n(r.start)} a ${n(r.score)} provas  ·  muro ${n(r.wall)}`;
 }
 
 /** Monta o conteúdo do card viral a partir do resultado + copy do tema. */
