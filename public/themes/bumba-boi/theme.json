@@ -20,6 +20,10 @@
     "villain.body": "#5A6678",
     "villain.skin": "#C7CEDA",
     "villain.accent": "#2A323F",
+    "enemy.body": "#5A6678",
+    "enemy.accent": "#7C879B",
+    "projectile.paper": "#FFF3B0",
+    "projectile.ink": "#2A323F",
     "text": "#F7F3E8",
     "text.muted": "#B5A9C2"
   },
@@ -37,6 +41,7 @@
     "card.fileName": "exercito-da-maruzza-boi.png",
     "card.record": "🏆 recorde:",
     "card.play": "▶ jogar",
+    "hud.weapon": "ARMA",
     "share.emoji": "🐂⚖️",
     "menu.pick": "Escolha o caso:",
     "wall.label": "MURO",
