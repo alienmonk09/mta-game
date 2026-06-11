@@ -38,3 +38,7 @@ export function opSign(op: GateOp): string {
       return '−';
   }
 }
+/** Este lado de portão mexe no tier da arma (eixo qualidade)? */
+export function isWeaponGate(op: GateOp): boolean {
+  return (op.weapon ?? 0) !== 0;
+}

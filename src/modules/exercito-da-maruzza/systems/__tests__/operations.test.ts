@@ -38,3 +38,17 @@ describe('opSign', () => {
     expect(opSign({ op: 'div', value: 1, label: '' })).toBe('÷');
   });
 });
+
+// acrescentar em src/modules/exercito-da-maruzza/systems/__tests__/operations.test.ts
+import { isWeaponGate } from '../operations';
+
+describe('isWeaponGate', () => {
+  it('detecta portão que mexe no tier da arma', () => {
+    expect(isWeaponGate({ op: 'add', value: 0, label: '', weapon: 1 })).toBe(true);
+    expect(isWeaponGate({ op: 'mul', value: 2, label: '', weapon: -1 })).toBe(true);
+  });
+  it('portão só de provas não é portão de arma', () => {
+    expect(isWeaponGate({ op: 'mul', value: 2, label: '' })).toBe(false);
+    expect(isWeaponGate({ op: 'add', value: 0, label: '', weapon: 0 })).toBe(false);
+  });
+});
