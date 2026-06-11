@@ -83,6 +83,10 @@ skin **Bumba meu boi** na Fase 4.
 - [ ] **Fase 5 — Hub & expansão** ⏸️ **ADIADA** (decisão 2026-06-10): construir Hub multi-jogo com
       apenas 1 módulo é YAGNI. O contrato `GameModule` já é hub-ready; a Fase 5 entra quando existir um
       **2º jogo** (ver §6: INSSdle/Wordle, Fura-Fila Flappy, etc.). Aí o Hub vira dor real.
+- [x] **Redesign Army Shooter 2.5D (MVP)** ✅ pseudo-3D (`projection`), Maruzza atiradora, `combat` dps-tick,
+      inimigos (`Enemy`), portões de dois eixos (`GateOp.weapon?`), boss com HP (`resolveBoss`), juice (`Fx`),
+      projéteis (`Projectiles`). BPC = caso vitrine. **Verificado:** typecheck + testes + build + smoke (combate).
+      Campanha (Fase 6) e meta-progressão (Fase 7) ficam pro futuro.
 
 ## Verificação (sempre rodar antes de marcar fase como done)
 ```bash

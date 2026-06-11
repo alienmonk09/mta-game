@@ -209,6 +209,19 @@ Cada fase entrega algo jogável/verificável. ⚙️ = sistemas, 🎨 = arte, �
 - Backlog dos outros jogos como **módulos futuros** (ver **§6**). Leaderboard online opcional.
 - **Marco:** plataforma multi-jogo, não um app só.
 
+### Fase R — Army Shooter 2.5D (redesign do núcleo) ✅/⏳
+- Câmera **pseudo-3D** (`projection.ts`), **Maruzza heroína atiradora** (provas = potência da arma),
+  **combate dps-tick** (`combat.ts`) + projéteis-juice (`Projectiles`), **inimigos/obstáculos** da burocracia
+  (`Enemy`), **portões de dois eixos** (quantidade × qualidade — `GateOp.weapon?`), **boss com HP** (`resolveBoss`).
+- Arte segue **procedural/zero-asset** (direção B); fronteira do resolvedor mantém a porta aberta pra ilustração por-skin (C).
+- Spec: `docs/superpowers/specs/2026-06-11-army-shooter-pseudo3d-design.md`.
+
+### Fase 6 — Campanha por níveis (futuro)
+- Casos viram estágios de dificuldade crescente; timeline de encontros (ondas); boss crescente; desbloqueio progressivo.
+
+### Fase 7 — Meta-progressão "Escritório da Maruzza" (futuro)
+- Recurso entre runs → upgrades permanentes (exército inicial, arma de largada, perks). Liga ao Hub (§5).
+
 ---
 
 ## 5. Produção paralela por agentes de IA
