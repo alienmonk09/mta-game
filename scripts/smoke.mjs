@@ -70,12 +70,18 @@ try {
   if (!boot.canvas || boot.canvas.w === 0) throw new Error('canvas não renderizou');
   console.log(`boot ok · cenas ativas: ${boot.scenes.join(', ')} · canvas ${boot.canvas.w}x${boot.canvas.h}`);
 
-  // entra na RunScene e deixa rodar (gera erro de runtime se a cena quebrar)
+  // entra na RunScene (BPC tem inimigos + boss com HP) e deixa rodar até resolver,
+  // simulando toque pra dispensar o onboarding/iniciar áudio. Gera erro se a cena quebrar.
   await page.evaluate(() => window.__MTA_GAME__.scene.start('RunScene', { casoId: 'bpc' }));
+  await sleep(800);
+  await page.mouse.click(240, 600); // dispensa onboarding na 1ª vez / inicia
   await sleep(2500);
   const inRun = await page.evaluate(() => window.__MTA_GAME__.scene.getScenes(true).map((s) => s.scene.key));
-  if (!inRun.includes('RunScene')) throw new Error(`RunScene não ativa (ativas: ${inRun.join(', ')})`);
-  console.log(`RunScene rodando · cenas ativas: ${inRun.join(', ')}`);
+  // a run dura ~12s; aqui ela ainda deve estar ativa (ou já em ResultScene), sem erro de runtime
+  if (!inRun.includes('RunScene') && !inRun.includes('ResultScene')) {
+    throw new Error(`nem RunScene nem ResultScene ativas (ativas: ${inRun.join(', ')})`);
+  }
+  console.log(`RunScene de combate rodando · cenas ativas: ${inRun.join(', ')}`);
 
   // Fase 2: entra na ResultScene e valida a geração do card viral (Canvas → PNG)
   const RESULT = {
