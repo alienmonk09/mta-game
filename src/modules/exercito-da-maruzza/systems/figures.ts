@@ -144,3 +144,45 @@ export function villainTexture(scene: Phaser.Scene, c: FigureColors): string {
     g.strokePath();
   });
 }
+
+/** Projétil "prova": um documentinho (folha com dobra) — cores do tema. */
+export function projectileTexture(scene: Phaser.Scene, c: { paper: number; ink: number; outline: number }): string {
+  const k = `fig:proj:${c.paper}:${c.ink}:${c.outline}`;
+  const w = 16, h = 20;
+  return bake(scene, k, w, h, (g) => {
+    // folha
+    g.fillStyle(c.paper, 1);
+    g.fillRoundedRect(2, 1, w - 4, h - 2, 3);
+    g.lineStyle(2, c.outline, 1);
+    g.strokeRoundedRect(2, 1, w - 4, h - 2, 3);
+    // linhas de texto (tinta)
+    g.fillStyle(c.ink, 1);
+    g.fillRect(5, 6, w - 10, 2);
+    g.fillRect(5, 10, w - 10, 2);
+    g.fillRect(5, 14, w - 12, 2);
+  });
+}
+
+/**
+ * Obstáculo de burocracia (NUNCA pessoa): carimbo "exigência" ou pilha de
+ * processos. `kind` muda a silhueta; cores vêm do tema (enemy.*).
+ */
+export function obstacleTexture(scene: Phaser.Scene, kind: 'carimbo' | 'pilha', c: { body: number; accent: number; outline: number }): string {
+  const k = `fig:obst:${kind}:${c.body}:${c.accent}:${c.outline}`;
+  const w = 56, h = 56;
+  return bake(scene, k, w, h, (g) => {
+    const cx = w / 2;
+    if (kind === 'carimbo') {
+      // cabo + base de carimbo
+      g.fillStyle(c.accent, 1);
+      g.fillRoundedRect(cx - 6, 6, 12, 16, 4); // cabo
+      blob(g, cx - 18, 22, 36, 16, 5, c.body, c.outline); // corpo
+      blob(g, cx - 22, 38, 44, 12, 4, c.accent, c.outline); // base
+    } else {
+      // pilha de 3 folhas empilhadas, levemente tortas
+      blob(g, cx - 20, 30, 40, 18, 3, c.body, c.outline);
+      blob(g, cx - 18, 18, 38, 16, 3, c.body, c.outline);
+      blob(g, cx - 16, 8, 34, 14, 3, c.accent, c.outline);
+    }
+  });
+}
