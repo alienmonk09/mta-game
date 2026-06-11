@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import flat from '../../../../../public/themes/flat-default/theme.json';
 import boi from '../../../../../public/themes/bumba-boi/theme.json';
+import { WEAPON_LADDER } from '../weapons';
 
 /**
  * Contrato de skin (roadmap §2.2): arte/copy é DADO. Toda skin preenche os MESMOS
@@ -15,7 +16,7 @@ const THEMES: Record<string, Theme> = {
 
 // frases que insinuam resultado jurídico real
 const FORBIDDEN = /benef[ií]cio concedido|concedid|defere|deferid|voc[eê] tem direito|garantid/i;
-const OAB_KEYS = ['result.win', 'result.lose', 'card.brand', 'card.subtitle', 'card.metric', 'card.viral', 'card.footnote'];
+const OAB_KEYS = ['result.win', 'result.lose', 'card.brand', 'card.subtitle', 'card.metric', 'card.viral', 'card.footnote', 'hud.weapon'];
 
 describe.each(Object.entries(THEMES))('copy OAB-safe (tema %s)', (_id, theme) => {
   for (const key of OAB_KEYS) {
@@ -43,6 +44,14 @@ describe('parity de tokens entre skins (a skin não pode "esquecer" um token)', 
     it(`skin "${id}" tem todas as chaves de copy do contrato`, () => {
       const missing = flatCopy.filter((k) => !(k in theme.copy));
       expect(missing, `copy sem chaves: ${missing.join(', ')}`).toEqual([]);
+    });
+  }
+});
+
+describe('labels de arma OAB-safe (qualidade da prova, não promessa)', () => {
+  for (const tier of WEAPON_LADDER) {
+    it(`"${tier.label}" não promete/insinua resultado jurídico`, () => {
+      expect(FORBIDDEN.test(tier.label), `arma "${tier.label}" soa como veredito`).toBe(false);
     });
   }
 });
