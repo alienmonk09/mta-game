@@ -6,12 +6,18 @@
   "start": 1,
   "speed": 320,
   "wall": 60,
+  "bossHp": 400,
   "gates": [
-    { "dist": 520,  "left": { "op": "mul", "value": 2, "label": "Laudo médico" },   "right": { "op": "sub", "value": 3, "label": "Sem laudo" } },
+    { "dist": 520,  "left": { "op": "mul", "value": 2, "label": "Laudo médico", "weapon": 1 }, "right": { "op": "sub", "value": 3, "label": "Sem laudo" } },
     { "dist": 1040, "left": { "op": "add", "value": 5, "label": "CNIS" },            "right": { "op": "div", "value": 2, "label": "Falta CNIS" } },
     { "dist": 1560, "left": { "op": "sub", "value": 5, "label": "Exigência" },        "right": { "op": "mul", "value": 2, "label": "CadÚnico" } },
-    { "dist": 2080, "left": { "op": "mul", "value": 2, "label": "Perícia" },          "right": { "op": "div", "value": 2, "label": "Remarcada" } },
+    { "dist": 2080, "left": { "op": "mul", "value": 2, "label": "Perícia", "weapon": 1 }, "right": { "op": "div", "value": 2, "label": "Remarcada" } },
     { "dist": 2600, "left": { "op": "add", "value": 10, "label": "Testemunha" },      "right": { "op": "sub", "value": 8, "label": "Indeferido" } },
     { "dist": 3120, "left": { "op": "div", "value": 3, "label": "Renda alta" },        "right": { "op": "mul", "value": 2, "label": "Laudo social" } }
+  ],
+  "enemies": [
+    { "kind": "carimbo", "dist": 800,  "lane": -0.5, "hp": 30, "label": "Exigência" },
+    { "kind": "pilha",   "dist": 1800, "lane": 0.5,  "hp": 60, "label": "Fila" },
+    { "kind": "carimbo", "dist": 2400, "lane": 0.0,  "hp": 90, "label": "Indeferido" }
   ]
 }
